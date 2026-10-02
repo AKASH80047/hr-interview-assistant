@@ -2,9 +2,12 @@
 
 **An AI-assisted workspace for organizing candidates, preparing interviews, and keeping hiring workflows in one place.**
 
-[**Live Application**](https://hr-interview-assistant-six.vercel.app/) · [**Backend API Documentation**](https://hr-interview-assistant.onrender.com/docs) · [**GitHub Repository**](https://github.com/phartyaldiksha05-ux/hr-interview-assistant)
+[**Live Application (GitHub Pages)**](https://akash80047.github.io/hr-interview-assistant/#/login) · [**GitHub Repository**](https://github.com/AKASH80047/hr-interview-assistant)
 
-> **Project status:** Actively developed by a three-member team. Some features listed in the roadmap are not yet available in the live application.
+### 🚀 Instant Demo Credentials
+- **Email:** `demo@company.com`
+- **Password:** `demo1234`
+*(Pre-filled on the login screen for instant access!)*
 
 ## Overview
 
@@ -12,23 +15,19 @@ Meetwise AI helps HR teams manage candidates, organize interviews, and use AI to
 
 ## Current Features
 
-- HR registration and login
-- Candidate management and candidate profiles
-- Resume upload and extraction workflows
-- AI-assisted interview preparation using Groq
-- Interview scheduling, notes, and HR reminder workflows
-- Dashboard for managing hiring activities
-
-**Note:** The team is reviewing and testing existing workflows end to end. A listed feature may still be under improvement.
+- **Modern SaaS UI:** Premium responsive design with Light/Dark mode themes.
+- **Candidate Pipeline:** Track candidate stages from Screening to Offer.
+- **Job Management:** Create and organize open openings across departments.
+- **AI Briefings & Evaluations:** Instant resume parsing and candidate analysis.
+- **Interview Coordination:** Manage schedules, interview notes, and HR alerts.
+- **Interactive Demo Mode:** Seamless offline / static preview for GitHub Pages.
 
 ## Live Deployment
 
 | Component | Platform | Link |
 | --- | --- | --- |
-| Frontend | Vercel | [Open Meetwise AI](https://hr-interview-assistant-six.vercel.app/) |
-| Backend | Render | [API Documentation](https://hr-interview-assistant.onrender.com/docs) |
-| Database | Neon PostgreSQL | Private; no public database link |
-| Source code | GitHub | [hr-interview-assistant](https://github.com/phartyaldiksha05-ux/hr-interview-assistant) |
+| Frontend | GitHub Pages | [Open Meetwise Web App](https://akash80047.github.io/hr-interview-assistant/#/login) |
+| Source Code | GitHub | [AKASH80047/hr-interview-assistant](https://github.com/AKASH80047/hr-interview-assistant) |
 
 The Render Free instance may take time to respond after inactivity.
 
