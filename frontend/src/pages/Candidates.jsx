@@ -4,7 +4,23 @@ import { candidatesApi } from "../api/candidates";
 import { useApi } from "../hooks/useApi";
 import CandidateForm from "../components/CandidateForm";
 import ResumeUploadForm from "../components/ResumeUploadForm";
-import { color, s, badge } from "../styles/theme";
+import { color, s, radius, spacing, shadow } from "../styles/theme";
+
+// Helper for status colors
+function getStatusStyle(status) {
+  switch (status?.toLowerCase()) {
+    case "hired":
+    case "offered":
+      return { bg: color.successBg, fg: color.success };
+    case "interviewed":
+    case "interviewing":
+      return { bg: color.infoBg, fg: color.info };
+    case "rejected":
+      return { bg: color.errorBg, fg: color.error };
+    default:
+      return { bg: color.surfaceAlt, fg: color.textSecondary };
+  }
+}
 
 export default function Candidates() {
   const location = useLocation();
@@ -21,9 +37,8 @@ export default function Candidates() {
   const filteredCandidates = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     if (!normalizedQuery) return candidates ?? [];
-    return (candidates ?? []).filter((candidate) =>
-      [candidate.name, candidate.email, candidate.phone, candidate.job_role]
-        .some((value) => value?.toLowerCase().includes(normalizedQuery))
+    return (candidates ?? []).filter((c) =>
+      [c.name, c.email, c.phone, c.job_role].some((value) => value?.toLowerCase().includes(normalizedQuery))
     );
   }, [candidates, query]);
 
@@ -45,7 +60,7 @@ export default function Candidates() {
           setFormMode(null);
           return;
         } catch {
-          setActionError("A profile already uses this email, but it is archived or unavailable. Check Archived Candidates before retrying.");
+          setActionError("A profile already uses this email, but it is archived. Check Archived Candidates.");
           setFormMode(null);
           return;
         }
@@ -68,7 +83,7 @@ export default function Candidates() {
   }
 
   async function handleDelete(candidate) {
-    if (!window.confirm(`Archive ${candidate.name} from the active list? Their resume and interview history will be retained and can be restored.`)) return;
+    if (!window.confirm(`Archive ${candidate.name}?`)) return;
     setActionError(null);
     try {
       await candidatesApi.remove(candidate.id);
@@ -95,65 +110,120 @@ export default function Candidates() {
   }
 
   return (
-    <div className="candidate-page">
-      <header className="directory-header">
+    <div style={styles.container}>
+      <header style={styles.header}>
         <div>
-          <span className="workspace-overline">PEOPLE & PIPELINE</span>
-          <h1>Candidates</h1>
-          <p>Keep profiles, resume context, and interview preparation together.</p>
+          <h1 style={s.h1}>Candidates</h1>
+          <p style={s.body}>Keep profiles, resume context, and interview preparation together.</p>
         </div>
-        <div className="directory-actions">
-          <button className="workspace-secondary-action" type="button" onClick={() => { setShowArchived((value) => !value); setShowUpload(false); setFormMode(null); setDuplicateCandidate(null); }}>{showArchived ? "Active candidates" : "Archived candidates"}</button>
-          <button className="workspace-secondary-action" onClick={() => { setShowUpload(true); setFormMode(null); }}>↑ Upload Resume</button>
-          <button className="workspace-primary-action" onClick={() => { setFormMode("create"); setShowUpload(false); }}>＋ Add Candidate</button>
+        <div style={styles.actions}>
+          <button style={s.buttonSecondary} onClick={() => { setShowArchived(v => !v); setShowUpload(false); setFormMode(null); setDuplicateCandidate(null); }}>
+            {showArchived ? "Active candidates" : "Archived candidates"}
+          </button>
+          <button style={s.buttonSecondary} onClick={() => { setShowUpload(true); setFormMode(null); }}>↑ Upload Resume</button>
+          <button style={s.buttonPrimary} onClick={() => { setFormMode("create"); setShowUpload(false); }}>＋ Add Candidate</button>
         </div>
       </header>
 
+      {/* Forms & Notifications */}
       {showUpload && <ResumeUploadForm existingCandidate={duplicateCandidate} onCancel={() => setShowUpload(false)} onComplete={finishUpload} />}
       {formMode === "create" && <CandidateForm onSubmit={handleCreate} onCancel={() => setFormMode(null)} submitting={submitting} />}
       {formMode && formMode !== "create" && <CandidateForm initialValues={formMode} onSubmit={handleUpdate} onCancel={() => setFormMode(null)} submitting={submitting} />}
 
-      {duplicateCandidate && !showUpload && <div className="candidate-duplicate-notice" role="alert"><div><strong>A candidate with this email already exists.</strong><span>{duplicateCandidate.name} · {duplicateCandidate.email} · {duplicateCandidate.job_role}</span></div><div className="resume-duplicate-actions"><button className="resume-flow-text-button" type="button" onClick={() => navigate(`/candidates/${duplicateCandidate.id}`)}>Open Existing Candidate</button><button className="workspace-primary-action" type="button" onClick={() => setShowUpload(true)}>Upload Resume to Existing Candidate</button></div></div>}
-
-      {actionError && <p className="workspace-inline-error" role="alert">{actionError}</p>}
-
-      <section className="candidate-directory" aria-label="Candidate directory">
-        <div className="candidate-directory-toolbar">
-          <div className="candidate-search-wrap">
-            <span aria-hidden="true">⌕</span>
-            <input type="search" aria-label="Search candidates" placeholder="Search by name, email, or role" value={query} onChange={(event) => setQuery(event.target.value)} />
+      {duplicateCandidate && !showUpload && (
+        <div style={styles.noticeAlert}>
+          <div><strong>A candidate with this email already exists.</strong><br/>{duplicateCandidate.name} · {duplicateCandidate.email}</div>
+          <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+            <button style={s.buttonSecondary} onClick={() => navigate(`/candidates/${duplicateCandidate.id}`)}>Open Profile</button>
+            <button style={s.buttonPrimary} onClick={() => setShowUpload(true)}>Upload Resume</button>
           </div>
-          <span className="candidate-result-count">{loading ? "Loading candidates…" : `${filteredCandidates.length} ${filteredCandidates.length === 1 ? "candidate" : "candidates"}`}</span>
+        </div>
+      )}
+
+      {actionError && <div style={{ ...styles.noticeAlert, background: color.errorBg, color: color.error }}>{actionError}</div>}
+      {error && <div style={{ ...styles.noticeAlert, background: color.errorBg, color: color.error }}>{error}</div>}
+
+      {/* Directory section */}
+      <section style={s.card}>
+        <div style={styles.toolbar}>
+          <input 
+            type="search" 
+            placeholder="Search by name, email, or role..." 
+            style={{ ...s.input, maxWidth: 300 }}
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+          <span style={s.small}>{loading ? "Loading..." : `${filteredCandidates.length} candidate(s)`}</span>
         </div>
 
-        {loading && <div className="candidate-directory-loading">Loading your candidates…</div>}
-        {error && <p className="workspace-inline-error candidate-load-error" role="alert">{error}</p>}
-        {!loading && !error && candidates?.length === 0 && (
-          <div className="candidate-directory-empty">
-            <span className="candidate-empty-mark">＋</span>
-            <h2>{showArchived ? "No archived candidates" : "Your candidate list starts here"}</h2>
-            <p>{showArchived ? "Archived profiles appear here and can be restored without losing their history." : "Add a profile or upload a resume to start preparing for a better interview."}</p>
-            {!showArchived && <div><button className="workspace-primary-action" onClick={() => setShowUpload(true)}>↑ Upload Resume</button><button className="workspace-secondary-action" onClick={() => setFormMode("create")}>Add Candidate</button></div>}
+        {loading ? (
+          <div style={s.emptyState}>Loading candidates...</div>
+        ) : filteredCandidates.length === 0 ? (
+          <div style={s.emptyState}>
+            <div style={{ fontSize: 24, marginBottom: 12 }}>＋</div>
+            <h3 style={s.h3}>{showArchived ? "No archived candidates" : "No candidates found"}</h3>
+            <p style={s.body}>Add a profile or upload a resume to start preparing for a better interview.</p>
           </div>
-        )}
-        {!loading && !error && candidates?.length > 0 && filteredCandidates.length === 0 && (
-          <div className="candidate-search-empty"><strong>No matches found</strong><span>Try another name, email address, or job role.</span></div>
-        )}
-        {!loading && !error && filteredCandidates.length > 0 && (
-          <div className="candidate-table-scroll">
-            <table className="candidate-table">
-              <thead><tr><th>Candidate</th><th>Contact</th><th>Job role</th><th>Status</th><th>Resume</th><th><span className="sr-only">Actions</span></th></tr></thead>
+        ) : (
+          <div style={{ overflowX: "auto" }}>
+            <table style={s.table}>
+              <thead>
+                <tr>
+                  <th style={s.th}>Candidate</th>
+                  <th style={s.th}>Contact</th>
+                  <th style={s.th}>Job Role</th>
+                  <th style={s.th}>Status</th>
+                  <th style={s.th}>Resume</th>
+                  <th style={s.th}>Actions</th>
+                </tr>
+              </thead>
               <tbody>
-                {filteredCandidates.map((candidate) => (
-                  <tr key={candidate.id}>
-                    <td><Link className="candidate-table-profile" to={`/candidates/${candidate.id}`}><span className="candidate-initials">{candidate.name.split(/\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase()}</span><span><strong>{candidate.name}</strong><small>View candidate profile</small></span></Link></td>
-                    <td><span className="candidate-contact">{candidate.email}</span><small className="candidate-phone">{candidate.phone || "No phone added"}</small></td>
-                    <td>{candidate.job_role}</td>
-                    <td><span className="candidate-status-badge" style={{ color: badge(candidate.status).fg, background: badge(candidate.status).background }}>{candidate.status}</span></td>
-                    <td>{candidate.has_resume ? <span className="resume-present"><i /> On file</span> : showArchived ? "—" : <Link className="candidate-upload-link" to={`/candidates/${candidate.id}`} state={{ openResumePicker: true }}>Upload PDF <span>→</span></Link>}</td>
-                    <td><div className="candidate-row-actions">{showArchived ? <button type="button" onClick={() => handleRestore(candidate)}>Restore</button> : <><button type="button" onClick={() => setFormMode(candidate)}>Edit</button><button type="button" onClick={() => handleDelete(candidate)}>Archive</button></>}</div></td>
-                  </tr>
-                ))}
+                {filteredCandidates.map(c => {
+                  const statusSty = getStatusStyle(c.status);
+                  const initials = c.name.split(/\s+/).map(p => p[0]).slice(0, 2).join("").toUpperCase();
+                  
+                  return (
+                    <tr key={c.id} style={{ transition: "background 0.2s" }} onMouseOver={e => e.currentTarget.style.background = color.surfaceAlt} onMouseOut={e => e.currentTarget.style.background = "transparent"}>
+                      <td style={s.td}>
+                        <Link style={styles.profileLink} to={`/candidates/${c.id}`}>
+                          <div style={styles.avatar}>{initials}</div>
+                          <div>
+                            <strong>{c.name}</strong>
+                          </div>
+                        </Link>
+                      </td>
+                      <td style={s.td}>
+                        <div>{c.email}</div>
+                        <div style={s.small}>{c.phone || "No phone"}</div>
+                      </td>
+                      <td style={s.td}>{c.job_role}</td>
+                      <td style={s.td}>
+                        <span style={{ padding: "4px 8px", borderRadius: radius.md, fontSize: "12px", fontWeight: 600, background: statusSty.bg, color: statusSty.fg }}>
+                          {c.status}
+                        </span>
+                      </td>
+                      <td style={s.td}>
+                        {c.has_resume ? (
+                          <span style={{ color: color.success, fontWeight: 500, fontSize: "13px" }}>✓ On file</span>
+                        ) : showArchived ? "—" : (
+                          <Link to={`/candidates/${c.id}`} state={{ openResumePicker: true }} style={{ fontSize: "13px", color: color.info, textDecoration: "none", fontWeight: 500 }}>Upload PDF</Link>
+                        )}
+                      </td>
+                      <td style={s.td}>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          {showArchived ? (
+                            <button style={{ ...s.buttonSecondary, padding: "4px 8px", minHeight: 28, fontSize: "12px" }} onClick={() => handleRestore(c)}>Restore</button>
+                          ) : (
+                            <>
+                              <button style={{ ...s.buttonSecondary, padding: "4px 8px", minHeight: 28, fontSize: "12px" }} onClick={() => setFormMode(c)}>Edit</button>
+                              <button style={{ ...s.buttonSecondary, padding: "4px 8px", minHeight: 28, fontSize: "12px", color: color.error }} onClick={() => handleDelete(c)}>Archive</button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -162,3 +232,56 @@ export default function Candidates() {
     </div>
   );
 }
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    gap: spacing[24],
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    flexWrap: "wrap",
+    gap: spacing[16],
+  },
+  actions: {
+    display: "flex",
+    gap: spacing[12],
+    flexWrap: "wrap",
+  },
+  toolbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing[16],
+    gap: spacing[16],
+  },
+  noticeAlert: {
+    padding: spacing[16],
+    background: color.warningBg,
+    color: color.warning,
+    borderRadius: radius.md,
+    border: `1px solid ${color.border}`,
+  },
+  profileLink: {
+    display: "flex",
+    alignItems: "center",
+    gap: spacing[12],
+    textDecoration: "none",
+    color: color.textPrimary,
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 999,
+    background: color.primary,
+    color: color.textOnPrimary,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "12px",
+    fontWeight: 700,
+  }
+};

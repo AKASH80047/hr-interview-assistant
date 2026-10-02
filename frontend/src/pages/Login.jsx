@@ -1,101 +1,222 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { ThemeToggle } from "../components/ThemeToggle";
-import "../styles/auth.css";
+import { color, font, radius, spacing } from "../styles/theme";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState("demo@company.com");
+  const [password, setPassword] = useState("demo1234");
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const update = (e) => {
-    setForm((current) => ({ ...current, [e.target.name]: e.target.value }));
-    if (error) setError("");
-  };
-
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setError(null);
     setLoading(true);
-
     try {
-      await login(form.email, form.password);
+      await login(email, password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err?.message || "Unable to sign in. Please check your details.");
+      setError(err?.message || "Invalid credentials. Try demo / demo.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="auth-page-v2">
-      <div className="auth-glow auth-glow-one" />
-      <div className="auth-glow auth-glow-two" />
+    <div style={styles.container}>
+      <div style={styles.themeToggleContainer}>
+        <ThemeToggle />
+      </div>
 
-      <header className="auth-topbar">
-        <Link to="/" className="auth-logo" aria-label="Meetwise home">
-          <span className="auth-logo-mark">M</span>
-          <span>meetwise</span>
-        </Link>
-
-        <div className="auth-top-actions">
-          <span className="auth-theme-label">Appearance</span>
-          <ThemeToggle />
+      <div style={styles.contentWrapper}>
+        <div style={styles.brandContainer}>
+          <div style={{...styles.logoMark, color: "white", fontSize: 20, fontWeight: 800}}>M</div>
+          <h1 style={styles.brandTitle}>meetwise</h1>
         </div>
-      </header>
 
-      <section className="auth-layout-v2">
-        <div className="auth-panel">
-          <div className="auth-panel-head">
-            <span className="auth-kicker">WELCOME BACK</span>
-            <h2>Sign in to Meetwise</h2>
-            <p>Pick up where your interview workflow left off.</p>
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.welcomeText}>Welcome back</h2>
+            <p style={styles.subtitle}>Sign in to your workspace</p>
           </div>
 
-          <form className="auth-form-v2" onSubmit={submit}>
-            {error && <div className="auth-error" role="alert">{error}</div>}
-
-            <label>
-              Work email
+          <form onSubmit={handleSubmit} style={styles.form}>
+            {error && <div style={styles.error}>{error}</div>}
+            
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Email Address</label>
               <input
-                name="email"
                 type="email"
-                autoComplete="email"
-                value={form.email}
-                onChange={update}
+                required
+                style={styles.input}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
-                required
               />
-            </label>
-
-            <label>
-              Password
+            </div>
+            
+            <div style={styles.inputGroup}>
+              <div style={styles.labelRow}>
+                <label style={styles.label}>Password</label>
+              </div>
               <input
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                value={form.password}
-                onChange={update}
-                placeholder="Enter your password"
                 required
+                style={styles.input}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
               />
-            </label>
+            </div>
 
-            <button className="auth-submit" type="submit" disabled={loading}>
-              <span>{loading ? "Signing in..." : "Sign in"}</span>
-              {!loading && <span aria-hidden="true">→</span>}
+            <button type="submit" disabled={loading} style={styles.button}>
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
-          <p className="auth-switch">
-            New to Meetwise? <Link to="/register">Create your workspace</Link>
+          <p style={styles.registerPrompt}>
+            Don't have an account? <Link to="/register" style={styles.registerLink}>Create workspace</Link>
           </p>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
+
+const styles = {
+  container: {
+    display: "flex",
+    minHeight: "100vh",
+    fontFamily: font.family,
+    background: color.surfaceAlt,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    padding: spacing[24],
+  },
+  themeToggleContainer: {
+    position: "absolute",
+    top: spacing[24],
+    right: spacing[24],
+    zIndex: 100,
+  },
+  contentWrapper: {
+    width: "100%",
+    maxWidth: "420px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  brandContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: spacing[12],
+    marginBottom: spacing[32],
+  },
+  logoMark: {
+    width: "32px",
+    height: "32px",
+    background: color.primary,
+    borderRadius: radius.md,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  brandTitle: {
+    fontSize: "28px",
+    fontWeight: 700,
+    margin: 0,
+    letterSpacing: "-0.02em",
+    color: color.textPrimary,
+  },
+  card: {
+    width: "100%",
+    background: color.surface,
+    borderRadius: radius.xl,
+    padding: spacing[40],
+    boxShadow: "0 20px 40px -12px rgba(0,0,0,0.1), 0 0 0 1px " + color.border,
+  },
+  cardHeader: {
+    textAlign: "center",
+    marginBottom: spacing[32],
+  },
+  welcomeText: {
+    fontSize: "24px",
+    fontWeight: 700,
+    color: color.textPrimary,
+    margin: `0 0 ${spacing[8]} 0`,
+    letterSpacing: "-0.02em",
+  },
+  subtitle: {
+    fontSize: "15px",
+    color: color.textSecondary,
+    margin: 0,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: spacing[20],
+  },
+  inputGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: spacing[8],
+  },
+  labelRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  label: {
+    fontSize: "14px",
+    fontWeight: 500,
+    color: color.textPrimary,
+  },
+  input: {
+    padding: `${spacing[12]} ${spacing[16]}`,
+    borderRadius: radius.md,
+    border: `1px solid ${color.borderStrong}`,
+    background: color.surface,
+    color: color.textPrimary,
+    fontSize: "15px",
+    fontFamily: font.family,
+    outline: "none",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+  },
+  button: {
+    padding: spacing[16],
+    borderRadius: radius.md,
+    border: "none",
+    background: color.primary,
+    color: color.textOnPrimary,
+    fontSize: "15px",
+    fontWeight: 600,
+    cursor: "pointer",
+    marginTop: spacing[8],
+    transition: "background 0.2s",
+  },
+  error: {
+    padding: spacing[12],
+    background: color.errorBg,
+    color: color.error,
+    borderRadius: radius.md,
+    fontSize: "14px",
+    fontWeight: 500,
+    textAlign: "center",
+  },
+  registerPrompt: {
+    marginTop: spacing[32],
+    textAlign: "center",
+    fontSize: "14px",
+    color: color.textSecondary,
+  },
+  registerLink: {
+    color: color.primary,
+    textDecoration: "none",
+    fontWeight: 600,
+  },
+};

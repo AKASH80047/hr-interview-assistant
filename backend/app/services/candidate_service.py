@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 
 from sqlalchemy import func, select
@@ -49,7 +51,7 @@ def list_archived_candidates(db: Session, owner_id: uuid.UUID, skip: int = 0, li
     return candidates
 
 
-def restore_candidate(db: Session, candidate_id: uuid.UUID, owner_id: uuid.UUID) -> Candidate | None:
+def restore_candidate(db: Session, candidate_id: uuid.UUID, owner_id: uuid.UUID) -> Optional[Candidate]:
     candidate = db.execute(
         select(Candidate).where(
             Candidate.id == candidate_id,
@@ -66,7 +68,7 @@ def restore_candidate(db: Session, candidate_id: uuid.UUID, owner_id: uuid.UUID)
     return candidate
 
 
-def get_candidate(db: Session, candidate_id: uuid.UUID, owner_id: uuid.UUID) -> Candidate | None:
+def get_candidate(db: Session, candidate_id: uuid.UUID, owner_id: uuid.UUID) -> Optional[Candidate]:
     """owner_id is always required here — this is what stops one HR account from
     reading another's candidate by guessing/reusing a UUID, not just hiding it from lists."""
     stmt = select(Candidate).where(
@@ -78,7 +80,7 @@ def get_candidate(db: Session, candidate_id: uuid.UUID, owner_id: uuid.UUID) -> 
     return candidate
 
 
-def get_candidate_by_email(db: Session, email: str, owner_id: uuid.UUID) -> Candidate | None:
+def get_candidate_by_email(db: Session, email: str, owner_id: uuid.UUID) -> Optional[Candidate]:
     stmt = select(Candidate).where(
         func.lower(Candidate.email) == email.lower(),
         Candidate.owner_id == owner_id,
@@ -90,7 +92,7 @@ def get_candidate_by_email(db: Session, email: str, owner_id: uuid.UUID) -> Cand
     return candidate
 
 
-def email_taken(db: Session, email: str, owner_id: uuid.UUID, exclude_id: uuid.UUID | None = None) -> bool:
+def email_taken(db: Session, email: str, owner_id: uuid.UUID, exclude_id: Optional[uuid.UUID] = None) -> bool:
     """Emails remain reserved per-owner, including on soft-deleted candidates, to match
     the database's owner/email unique constraint."""
     stmt = select(Candidate.id).where(

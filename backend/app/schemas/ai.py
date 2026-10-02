@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 from datetime import datetime
 
@@ -9,9 +11,9 @@ class AIGenerationResponse(BaseModel):
     id: uuid.UUID
     kind: str
     status: str
-    content: dict | None
-    error_message: str | None
-    model_name: str | None
+    content: Optional[dict]
+    error_message: Optional[str]
+    model_name: Optional[str]
     created_at: datetime
 
 
@@ -21,7 +23,7 @@ class CandidateSummaryContent(BaseModel):
     relevant_experience: list[dict] = []
     projects: list[dict] = []
     skills: list[str] = []
-    experience_years: float | None = None
+    experience_years: Optional[float] = None
     education: list[str] = []
     relevant_technologies: list[str] = []
     strengths: list[dict | str] = []
@@ -41,13 +43,13 @@ class QuestionsContent(BaseModel):
 
 
 class QuestionGenerationRequest(BaseModel):
-    target_job_role: str | None = Field(default=None, min_length=1, max_length=150)
+    target_job_role: Optional[str] = Field(default=None, min_length=1, max_length=150)
 
 
 class QuestionSaveItem(BaseModel):
     question_text: str = Field(min_length=1, max_length=2000)
     category: str = Field(default="technical", min_length=1, max_length=30)
-    rationale: str | None = Field(default=None, max_length=2000)
+    rationale: Optional[str] = Field(default=None, max_length=2000)
 
 
 class PostInterviewSummaryContent(BaseModel):

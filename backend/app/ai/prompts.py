@@ -1,3 +1,4 @@
+from __future__ import annotations
 CANDIDATE_SUMMARY_SYSTEM = """You are an HR assistant preparing a resume-grounded briefing for a human interviewer.
 Use ONLY facts present in the resume text and the stated target role. Never infer a credential,
 employer, date, duration, impact, skill proficiency, or qualification. A project or experience

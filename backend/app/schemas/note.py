@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from datetime import datetime
 from typing import Literal
@@ -9,14 +10,14 @@ Recommendation = Literal["pending", "selected", "rejected", "hold"]
 
 class NoteCreate(BaseModel):
     content: str = Field(min_length=1)
-    rating: int | None = Field(default=None, ge=1, le=5)
-    recommendation: Recommendation | None = None
+    rating: Optional[int] = Field(default=None, ge=1, le=5)
+    recommendation: Optional[Recommendation] = None
 
 
 class NoteUpdate(BaseModel):
-    content: str | None = None
-    rating: int | None = Field(default=None, ge=1, le=5)
-    recommendation: Recommendation | None = None
+    content: Optional[str] = None
+    rating: Optional[int] = Field(default=None, ge=1, le=5)
+    recommendation: Optional[Recommendation] = None
 
 
 class NoteResponse(BaseModel):
@@ -24,7 +25,7 @@ class NoteResponse(BaseModel):
     id: uuid.UUID
     interview_id: uuid.UUID
     content: str
-    rating: int | None
-    recommendation: Recommendation | None
+    rating: Optional[int]
+    recommendation: Optional[Recommendation]
     created_at: datetime
     updated_at: datetime

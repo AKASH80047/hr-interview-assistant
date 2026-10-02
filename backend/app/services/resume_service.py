@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 
 from sqlalchemy import select, update
@@ -42,12 +44,12 @@ def list_resumes(db: Session, candidate_id: uuid.UUID) -> list[Resume]:
     return list(db.execute(stmt).scalars().all())
 
 
-def get_resume(db: Session, candidate_id: uuid.UUID, resume_id: uuid.UUID) -> Resume | None:
+def get_resume(db: Session, candidate_id: uuid.UUID, resume_id: uuid.UUID) -> Optional[Resume]:
     stmt = select(Resume).where(Resume.id == resume_id, Resume.candidate_id == candidate_id)
     return db.execute(stmt).scalar_one_or_none()
 
 
-def get_latest_resume(db: Session, candidate_id: uuid.UUID) -> Resume | None:
+def get_latest_resume(db: Session, candidate_id: uuid.UUID) -> Optional[Resume]:
     stmt = (
         select(Resume)
         .where(Resume.candidate_id == candidate_id, Resume.parse_status == "completed")

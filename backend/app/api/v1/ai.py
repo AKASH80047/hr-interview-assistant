@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -23,7 +25,7 @@ def generate_summary(
     return ai_service.run_candidate_summary(db, candidate)
 
 
-@router.get("/candidates/{candidate_id}/summary", response_model=AIGenerationResponse | None)
+@router.get("/candidates/{candidate_id}/summary", response_model=Optional[AIGenerationResponse])
 def get_summary(
     candidate_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
@@ -33,7 +35,7 @@ def get_summary(
     return ai_service.get_latest_generation(db, "candidate_summary", candidate_id=candidate_id)
 
 
-@router.get("/candidates/{candidate_id}/questions", response_model=AIGenerationResponse | None)
+@router.get("/candidates/{candidate_id}/questions", response_model=Optional[AIGenerationResponse])
 def get_candidate_questions(
     candidate_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
@@ -97,7 +99,7 @@ def generate_post_summary(
     return ai_service.run_post_interview_summary(db, interview, candidate)
 
 
-@router.get("/interviews/{interview_id}/post-summary", response_model=AIGenerationResponse | None)
+@router.get("/interviews/{interview_id}/post-summary", response_model=Optional[AIGenerationResponse])
 def get_post_summary(
     interview_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):

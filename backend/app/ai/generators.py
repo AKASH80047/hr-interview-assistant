@@ -1,3 +1,4 @@
+from __future__ import annotations
 from app.ai.client import generate_json
 from app.ai.prompts import CANDIDATE_SUMMARY_SYSTEM, POST_INTERVIEW_SYSTEM, QUESTIONS_SYSTEM
 

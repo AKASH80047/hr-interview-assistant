@@ -7,7 +7,7 @@ import { notesApi } from "../api/notes";
 import ResumeUploadForm from "../components/ResumeUploadForm";
 import { useApi } from "../hooks/useApi";
 import { formatLocalDateTime } from "../hooks/useCountdown";
-import { color, s, badge } from "../styles/theme";
+import { color, s, badge, spacing } from "../styles/theme";
 
 function SummaryPanel({ candidateId, hasResume }) {
   const {
@@ -777,7 +777,7 @@ export default function CandidateDetail() {
         style={styles.grid}
       >
         {showResumeUpload && (
-          <div style={{ gridColumn: "1 / -1" }}>
+          <div style={{ width: "100%" }}>
             <ResumeUploadForm
               existingCandidate={candidate}
               hasExistingResume={hasStoredResume}
@@ -787,303 +787,141 @@ export default function CandidateDetail() {
           </div>
         )}
 
-        <div style={s.card}>
-          <div style={styles.panelHeader}>
-            <h3 style={s.sectionTitle}>Resume</h3>
-
-            <button
-              type="button"
-              onClick={() => setShowResumeUpload(true)}
-              style={s.buttonSecondary}
-            >
-              {hasStoredResume
-                ? "Replace resume"
-                : "Upload PDF"}
-            </button>
-          </div>
-
-          {resumesLoading && (
-            <p style={s.emptyState} role="status">
-              Loading resume details…
-            </p>
-          )}
-
-          {resumesError && (
-            <div role="alert">
-              <p style={s.errorText}>{resumesError}</p>
-
+        <div style={styles.leftCol}>
+          <div style={s.card}>
+            <div style={styles.panelHeader}>
+              <h3 style={s.sectionTitle}>Resume</h3>
               <button
                 type="button"
-                onClick={refetchResumes}
+                onClick={() => setShowResumeUpload(true)}
                 style={s.buttonSecondary}
               >
-                Retry loading resumes
+                {hasStoredResume ? "Replace resume" : "Upload PDF"}
               </button>
             </div>
-          )}
 
-          {latestResume ? (
-            <div>
-              <p
-                style={{
-                  fontSize: 13,
-                  color:
-                    latestResume.parse_status === "completed"
-                      ? color.success
-                      : color.alarm,
-                  fontWeight: 600,
-                  margin: "0 0 5px",
-                  textTransform: "capitalize",
-                }}
-              >
-                Resume{" "}
-                {latestResume.parse_status.replaceAll("_", " ")}
-              </p>
+            {resumesLoading && <p style={s.emptyState} role="status">Loading resume details…</p>}
 
-              <p
-                style={{
-                  color: color.textHigh,
-                  fontSize: 13,
-                  margin: 0,
-                  overflowWrap: "anywhere",
-                }}
-              >
-                {latestResume.original_filename}
-              </p>
-
-              <div className="resume-profile-actions">
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleDownloadResume(latestResume)
-                  }
-                  style={s.buttonSecondary}
-                >
-                  View / Download resume
+            {resumesError && (
+              <div role="alert">
+                <p style={s.errorText}>{resumesError}</p>
+                <button type="button" onClick={refetchResumes} style={s.buttonSecondary}>
+                  Retry loading resumes
                 </button>
-
-                <span
-                  style={{
-                    color: color.textLow,
-                    fontSize: 12,
-                  }}
-                >
-                  {latestResume.file_size_bytes
-                    ? `${(
-                        latestResume.file_size_bytes /
-                        (1024 * 1024)
-                      ).toFixed(2)} MB`
-                    : "PDF"}
-                </span>
               </div>
+            )}
 
-              {latestResume.parse_error && (
-                <p style={s.errorText}>
-                  {latestResume.parse_error}
+            {latestResume ? (
+              <div>
+                <p style={{ fontSize: 13, color: latestResume.parse_status === "completed" ? color.success : color.error, fontWeight: 600, margin: "0 0 5px", textTransform: "capitalize" }}>
+                  Resume {latestResume.parse_status.replaceAll("_", " ")}
                 </p>
-              )}
+                <p style={{ color: color.textPrimary, fontSize: 13, margin: 0, overflowWrap: "anywhere" }}>
+                  {latestResume.original_filename}
+                </p>
 
-              {latestResume.extracted_text && (
-                <details className="resume-extracted-details">
-                  <summary>
-                    Extracted resume information
-                  </summary>
+                <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+                  <button type="button" onClick={() => handleDownloadResume(latestResume)} style={s.buttonSecondary}>
+                    View / Download resume
+                  </button>
+                  <span style={{ color: color.textSecondary, fontSize: 12, display: "flex", alignItems: "center" }}>
+                    {latestResume.file_size_bytes ? `${(latestResume.file_size_bytes / (1024 * 1024)).toFixed(2)} MB` : "PDF"}
+                  </span>
+                </div>
 
-                  <pre>{latestResume.extracted_text}</pre>
-                </details>
-              )}
+                {latestResume.parse_error && <p style={s.errorText}>{latestResume.parse_error}</p>}
+
+                {latestResume.extracted_text && (
+                  <details style={{ marginTop: 24, fontSize: 13, color: color.textSecondary }}>
+                    <summary style={{ cursor: "pointer", fontWeight: 500, color: color.textPrimary }}>
+                      Extracted resume information
+                    </summary>
+                    <pre style={{ whiteSpace: "pre-wrap", background: color.surfaceAlt, padding: 16, borderRadius: 8, marginTop: 12, fontFamily: "monospace", fontSize: 12 }}>
+                      {latestResume.extracted_text}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            ) : (
+              !resumesLoading && !resumesError && (
+                <p style={s.emptyState}>No resume uploaded yet.</p>
+              )
+            )}
+
+            {resumeActionError && <p role="alert" style={s.errorText}>{resumeActionError}</p>}
+          </div>
+
+          <SummaryPanel candidateId={id} hasResume={hasResume} />
+          
+          <CandidateQuestionsPanel candidate={candidate} />
+        </div>
+
+        <div style={styles.rightCol}>
+          <div style={s.card}>
+            <div style={styles.panelHeader}>
+              <h3 style={s.sectionTitle}>Interviews</h3>
+              <button onClick={() => navigate(`/interviews?candidate=${id}`)} style={s.buttonSecondary}>
+                Schedule
+              </button>
             </div>
-          ) : (
-            !resumesLoading &&
-            !resumesError && (
-              <p style={s.emptyState}>
-                No resume uploaded yet.
-              </p>
-            )
-          )}
 
-          {resumeActionError && (
-            <p role="alert" style={s.errorText}>
-              {resumeActionError}
-            </p>
-          )}
-        </div>
-
-        <div style={s.card}>
-          <div style={styles.panelHeader}>
-            <h3 style={s.sectionTitle}>Interviews</h3>
-
-            <button
-              onClick={() =>
-                navigate(`/interviews?candidate=${id}`)
-              }
-              style={s.buttonSecondary}
-            >
-              Schedule
-            </button>
-          </div>
-
-          {interviewsLoading && (
-            <p style={s.emptyState} role="status">
-              Loading interview history…
-            </p>
-          )}
-
-          {interviewsError && (
-            <p role="alert" style={s.errorText}>
-              {interviewsError}
-            </p>
-          )}
-
-          {!interviewsLoading &&
-            !interviewsError &&
-            candidateInterviews.length === 0 && (
-              <p style={s.emptyState}>
-                No interviews scheduled yet.
-              </p>
+            {interviewsLoading && <p style={s.emptyState} role="status">Loading interview history…</p>}
+            {interviewsError && <p role="alert" style={s.errorText}>{interviewsError}</p>}
+            {!interviewsLoading && !interviewsError && candidateInterviews.length === 0 && (
+              <p style={s.emptyState}>No interviews scheduled yet.</p>
             )}
 
-          {candidateInterviews.map((iv) => {
-            const { date, time } = formatLocalDateTime(
-              iv.scheduled_at
-            );
-
-            return (
-              <Link
-                key={iv.id}
-                to={`/interviews/${iv.id}`}
-                style={styles.interviewRow}
-              >
-                <div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 500,
-                    }}
-                  >
-                    {date} at {time}
+            {candidateInterviews.map((iv) => {
+              const { date, time } = formatLocalDateTime(iv.scheduled_at);
+              return (
+                <Link key={iv.id} to={`/interviews/${iv.id}`} style={styles.interviewRow}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500 }}>{date} at {time}</div>
+                    <div style={{ fontSize: 12.5, color: color.textSecondary }}>{iv.interviewer ?? "No interviewer set"}</div>
                   </div>
-
-                  <div
-                    style={{
-                      fontSize: 12.5,
-                      color: color.textLow,
-                    }}
-                  >
-                    {iv.interviewer ?? "No interviewer set"}
-                  </div>
-                </div>
-
-                <span style={badge(iv.status)}>
-                  {iv.status}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-
-        <div style={s.card}>
-          <div style={styles.panelHeader}>
-            <h3 style={s.sectionTitle}>
-              HR feedback & notes
-            </h3>
-
-            <span
-              style={{
-                color: color.textLow,
-                fontSize: 12,
-              }}
-            >
-              {hrNotes.length}{" "}
-              {hrNotes.length === 1 ? "note" : "notes"}
-            </span>
+                  <span style={{ padding: "4px 8px", borderRadius: 8, fontSize: "12px", fontWeight: 600, background: color.infoBg, color: color.info }}>
+                    {iv.status}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
 
-          {notesLoading && (
-            <p style={s.emptyState}>
-              Loading interview notes…
-            </p>
-          )}
+          <div style={s.card}>
+            <div style={styles.panelHeader}>
+              <h3 style={s.sectionTitle}>HR feedback & notes</h3>
+              <span style={{ color: color.textSecondary, fontSize: 12 }}>
+                {hrNotes.length} {hrNotes.length === 1 ? "note" : "notes"}
+              </span>
+            </div>
 
-          {interviewsError && (
-            <p style={s.errorText}>{interviewsError}</p>
-          )}
-
-          {notesError && (
-            <p style={s.errorText}>{notesError}</p>
-          )}
-
-          {!notesLoading &&
-            !notesError &&
-            hrNotes.length === 0 && (
-              <p style={s.emptyState}>
-                Feedback added to interviews will appear here.
-              </p>
+            {notesLoading && <p style={s.emptyState}>Loading interview notes…</p>}
+            {interviewsError && <p style={s.errorText}>{interviewsError}</p>}
+            {notesError && <p style={s.errorText}>{notesError}</p>}
+            {!notesLoading && !notesError && hrNotes.length === 0 && (
+              <p style={s.emptyState}>Feedback added to interviews will appear here.</p>
             )}
 
-          {!notesLoading &&
-            hrNotes.map((note) => (
-              <article
-                key={note.id}
-                style={styles.noteItem}
-              >
+            {!notesLoading && hrNotes.map((note) => (
+              <article key={note.id} style={styles.noteItem}>
                 <div style={styles.noteMeta}>
-                  <Link
-                    to={`/interviews/${note.interview.id}`}
-                    style={styles.noteInterview}
-                  >
-                    {
-                      formatLocalDateTime(
-                        note.interview.scheduled_at
-                      ).date
-                    }{" "}
-                    interview
+                  <Link to={`/interviews/${note.interview.id}`} style={styles.noteInterview}>
+                    {formatLocalDateTime(note.interview.scheduled_at).date} interview
                   </Link>
-
-                  <time>
-                    {new Date(
-                      note.created_at
-                    ).toLocaleDateString()}
-                  </time>
+                  <time>{new Date(note.created_at).toLocaleDateString()}</time>
                 </div>
-
-                <p style={styles.noteContent}>
-                  {note.content}
-                </p>
-
+                <p style={styles.noteContent}>{note.content}</p>
                 <div style={styles.noteTags}>
-                  {note.rating != null && (
-                    <span>
-                      {note.rating}/5 rating
-                    </span>
-                  )}
-
+                  {note.rating != null && <span>{note.rating}/5 rating</span>}
                   {note.recommendation && (
-                    <span
-                      style={badge(note.recommendation)}
-                    >
+                    <span style={{ padding: "2px 8px", borderRadius: 4, background: color.surfaceAlt, fontSize: 11 }}>
                       {note.recommendation}
                     </span>
                   )}
                 </div>
               </article>
             ))}
-        </div>
-
-        <div
-          id="briefing"
-          style={{ gridColumn: "1 / -1" }}
-        >
-          <SummaryPanel
-            candidateId={id}
-            hasResume={hasResume}
-          />
-        </div>
-
-        <div style={{ gridColumn: "1 / -1" }}>
-          <CandidateQuestionsPanel
-            candidate={candidate}
-          />
+          </div>
         </div>
       </div>
     </div>
@@ -1110,10 +948,24 @@ const styles = {
   },
 
   grid: {
-    display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(min(100%, 350px), 1fr))",
-    gap: 18,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: spacing[24],
+    alignItems: "flex-start",
+  },
+  leftCol: {
+    display: "flex",
+    flexDirection: "column",
+    gap: spacing[24],
+    flex: "2 1 600px",
+    minWidth: 0,
+  },
+  rightCol: {
+    display: "flex",
+    flexDirection: "column",
+    gap: spacing[24],
+    flex: "1 1 350px",
+    minWidth: 0,
   },
 
   panelHeader: {

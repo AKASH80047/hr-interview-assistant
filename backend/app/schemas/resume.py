@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from datetime import datetime
 from typing import Literal
@@ -12,9 +13,9 @@ class ResumeResponse(BaseModel):
     id: uuid.UUID
     candidate_id: uuid.UUID
     original_filename: str
-    file_size_bytes: int | None
+    file_size_bytes: Optional[int]
     parse_status: ParseStatus
-    parse_error: str | None
-    extracted_text: str | None
-    parsed_data: dict | None
+    parse_error: Optional[str]
+    extracted_text: Optional[str]
+    parsed_data: Optional[dict]
     created_at: datetime

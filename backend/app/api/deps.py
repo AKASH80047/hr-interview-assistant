@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 
 from fastapi import Depends, HTTPException, status
@@ -15,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login", auto_error=Fa
 
 
 def get_current_user(
-    token: str | None = Depends(oauth2_scheme), db: Session = Depends(get_db)
+    token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> User:
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

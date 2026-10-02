@@ -2,183 +2,190 @@
 
 export const color = {
   // Main surfaces
-  canvas: "var(--mw-bg)",
+  canvas: "var(--mw-canvas)",
   surface: "var(--mw-surface)",
-  surfaceAlt: "var(--mw-surface-2)",
+  surfaceAlt: "var(--mw-surface-alt)",
 
-  // Text
-  textHigh: "var(--mw-text-high)",
-  textMid: "var(--mw-text-mid)",
-  textLow: "var(--mw-text-low)",
+  // Text Hierarchy
+  textPrimary: "var(--mw-text-primary)",
+  textSecondary: "var(--mw-text-secondary)",
+  textTertiary: "var(--mw-text-tertiary)",
 
   // Strong / dark controls
-  ink: "var(--mw-ink)",
-  inkSoft: "var(--mw-ink-soft)",
-
-  // Text placed on dark / ink surfaces
-  textOnInk: "var(--mw-text-on-ink)",
-  textOnInkMuted: "var(--mw-text-on-ink-muted)",
+  primary: "var(--mw-primary)",
+  primaryHover: "var(--mw-primary-hover)",
+  textOnPrimary: "var(--mw-text-on-primary)",
 
   // Borders
   border: "var(--mw-border)",
   borderStrong: "var(--mw-border-strong)",
 
-  // Accent
-  accent: "var(--mw-accent)",
-  accentSoft: "var(--mw-accent-soft)",
-  accentText: "var(--mw-accent-strong)",
-
   // Status
-  alarm: "var(--mw-danger)",
-  alarmSoft: "var(--mw-danger-soft)",
-
-  success: "var(--mw-accent-strong)",
-  successSoft: "var(--mw-accent-soft)",
-
-  info: "var(--mw-purple)",
-  infoSoft: "var(--mw-purple-soft)",
-
-  neutralSoft: "var(--mw-surface-2)",
+  success: "var(--mw-success)",
+  successBg: "var(--mw-success-bg)",
+  warning: "var(--mw-warning)",
+  warningBg: "var(--mw-warning-bg)",
+  error: "var(--mw-error)",
+  errorBg: "var(--mw-error-bg)",
+  info: "var(--mw-info)",
+  infoBg: "var(--mw-info-bg)",
 };
 
 export const font = {
-  family: "'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif",
+  family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+};
+
+export const spacing = {
+  4: "4px",
+  8: "8px",
+  12: "12px",
+  16: "16px",
+  20: "20px",
+  24: "24px",
+  32: "32px",
+  40: "40px",
+  48: "48px",
 };
 
 export const radius = {
-  sm: 9,
-  md: 12,
-  lg: 16,
+  sm: "6px",
+  md: "8px",
+  lg: "12px",
+  xl: "16px",
 };
 
 export const shadow = {
-  card: "0 7px 22px rgba(24, 45, 38, 0.06)",
-  raised: "0 18px 45px rgba(24, 45, 38, 0.07)",
+  sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+  md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  card: "0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 16px -4px rgba(0, 0, 0, 0.02)",
 };
 
 export const s = {
   page: {
     fontFamily: font.family,
-    color: color.textHigh,
+    color: color.textPrimary,
+    background: color.canvas,
+    minHeight: "100vh",
   },
 
   card: {
     background: color.surface,
     border: `1px solid ${color.border}`,
     borderRadius: radius.lg,
-    padding: "1.25rem 1.5rem",
+    padding: spacing[24],
+    boxShadow: shadow.card,
   },
 
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 700,
-    color: color.textHigh,
-    marginBottom: 14,
-  },
+  h1: { fontSize: "28px", fontWeight: 700, color: color.textPrimary, margin: `0 0 ${spacing[16]} 0`, letterSpacing: "-0.02em" },
+  h2: { fontSize: "22px", fontWeight: 600, color: color.textPrimary, margin: `0 0 ${spacing[16]} 0`, letterSpacing: "-0.01em" },
+  h3: { fontSize: "16px", fontWeight: 600, color: color.textPrimary, margin: `0 0 ${spacing[12]} 0` },
+  body: { fontSize: "14px", color: color.textSecondary, lineHeight: 1.5, margin: `0 0 ${spacing[12]} 0` },
+  small: { fontSize: "12px", color: color.textTertiary, margin: 0 },
 
   label: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 6,
-    marginBottom: 14,
-    fontSize: 13,
-    color: color.textMid,
-    fontWeight: 600,
+    display: "block",
+    marginBottom: spacing[8],
+    fontSize: "13px",
+    color: color.textPrimary,
+    fontWeight: 500,
   },
 
   input: {
-    padding: "0.62rem 0.75rem",
-    minHeight: 40,
+    width: "100%",
+    padding: `${spacing[8]} ${spacing[12]}`,
+    minHeight: "36px",
     boxSizing: "border-box",
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     border: `1px solid ${color.borderStrong}`,
-    fontSize: 13,
+    fontSize: "14px",
     fontFamily: font.family,
-    color: color.textHigh,
+    color: color.textPrimary,
     background: color.surface,
     outline: "none",
+    transition: "border-color 0.2s, box-shadow 0.2s",
   },
 
   buttonPrimary: {
-    padding: "0.62rem 1.1rem",
-    minHeight: 40,
-    borderRadius: radius.sm,
+    padding: `0 ${spacing[16]}`,
+    minHeight: "36px",
+    borderRadius: radius.md,
     border: "none",
-    background: color.ink,
-    color: color.textOnInk,
-    fontWeight: 700,
-    fontSize: 13,
+    background: color.primary,
+    color: color.textOnPrimary,
+    fontWeight: 500,
+    fontSize: "14px",
     cursor: "pointer",
     fontFamily: font.family,
+    transition: "background 0.2s",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing[8],
   },
 
   buttonSecondary: {
-    padding: "0.62rem 1.1rem",
-    minHeight: 40,
-    borderRadius: radius.sm,
+    padding: `0 ${spacing[16]}`,
+    minHeight: "36px",
+    borderRadius: radius.md,
     border: `1px solid ${color.borderStrong}`,
     background: color.surface,
-    color: color.textHigh,
-    fontWeight: 600,
-    fontSize: 13,
+    color: color.textPrimary,
+    fontWeight: 500,
+    fontSize: "14px",
     cursor: "pointer",
     fontFamily: font.family,
+    transition: "background 0.2s",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing[8],
   },
 
   buttonDanger: {
-    padding: "0.62rem 1.1rem",
-    minHeight: 40,
-    borderRadius: radius.sm,
-    border: `1px solid ${color.alarm}`,
-    background: color.surface,
-    color: color.alarm,
-    fontWeight: 600,
-    fontSize: 13,
-    cursor: "pointer",
-    fontFamily: font.family,
-  },
-
-  linkButton: {
+    padding: `0 ${spacing[16]}`,
+    minHeight: "36px",
+    borderRadius: radius.md,
     border: "none",
-    background: "transparent",
-    color: color.accentText,
+    background: color.error,
+    color: color.textOnPrimary,
+    fontWeight: 500,
+    fontSize: "14px",
     cursor: "pointer",
-    fontSize: 13,
-    fontWeight: 700,
     fontFamily: font.family,
-    padding: 0,
+    transition: "background 0.2s",
   },
 
   table: {
     width: "100%",
     borderCollapse: "collapse",
+    fontSize: "14px",
   },
 
   th: {
     textAlign: "left",
     borderBottom: `1px solid ${color.border}`,
-    padding: "0.7rem 0.75rem",
-    fontSize: 11,
-    fontWeight: 700,
-    color: color.textLow,
+    padding: `${spacing[12]} ${spacing[16]}`,
+    fontSize: "12px",
+    fontWeight: 500,
+    color: color.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
   },
 
   td: {
     borderBottom: `1px solid ${color.border}`,
-    padding: "0.75rem",
-    fontSize: 13,
-    color: color.textHigh,
+    padding: spacing[16],
+    color: color.textPrimary,
   },
 
   emptyState: {
-    color: color.textLow,
-    fontSize: 13,
-    padding: "1.5rem 0",
-  },
-
-  errorText: {
-    color: color.alarm,
-    fontSize: 13,
+    textAlign: "center",
+    color: color.textSecondary,
+    fontSize: "14px",
+    padding: spacing[48],
+    background: color.surfaceAlt,
+    borderRadius: radius.lg,
+    border: `1px dashed ${color.borderStrong}`,
   },
 };
 

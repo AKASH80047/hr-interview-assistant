@@ -1,3 +1,4 @@
+from __future__ import annotations
 from app.models.candidate import Candidate  # noqa: F401
 from app.models.interview import Interview  # noqa: F401
 from app.models.reminder import Reminder  # noqa: F401
@@ -6,3 +7,6 @@ from app.models.interview_question import InterviewQuestion  # noqa: F401
 from app.models.interview_note import InterviewNote  # noqa: F401
 from app.models.ai_generation import AIGeneration  # noqa: F401
 from app.models.user import User  # noqa: F401
+from app.models.job import Job  # noqa: F401
+from app.models.question_bank import QuestionBank  # noqa: F401
+from app.models.report import Report  # noqa: F401

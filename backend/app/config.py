@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -12,8 +13,13 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     CORS_ORIGINS: str = "http://localhost:5173"
 
-    GROQ_API_KEY: str | None = None
+    ACTIVE_AI_PROVIDER: str = "groq" # groq, openai, gemini
+    GROQ_API_KEY: Optional[str] = None
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-1.5-flash"
     UPLOAD_DIR: str = "uploads"
     REMINDER_POLL_SECONDS: int = 60
 

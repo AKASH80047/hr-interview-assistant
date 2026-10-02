@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from datetime import datetime
 from typing import Literal
@@ -10,11 +11,12 @@ InterviewType = Literal["video", "phone", "onsite"]
 
 class InterviewCreate(BaseModel):
     candidate_id: uuid.UUID
+    job_id: Optional[uuid.UUID] = None
     scheduled_at: datetime
     duration_minutes: int = Field(default=60, gt=0, le=480)
     interview_type: InterviewType = "video"
-    meeting_link: str | None = Field(default=None, max_length=500)
-    interviewer: str | None = Field(default=None, max_length=150)
+    meeting_link: Optional[str] = Field(default=None, max_length=500)
+    interviewer: Optional[str] = Field(default=None, max_length=150)
 
     @field_validator("scheduled_at")
     @classmethod
@@ -25,16 +27,16 @@ class InterviewCreate(BaseModel):
 
 
 class InterviewUpdate(BaseModel):
-    scheduled_at: datetime | None = None
-    duration_minutes: int | None = Field(default=None, gt=0, le=480)
-    interview_type: InterviewType | None = None
-    meeting_link: str | None = Field(default=None, max_length=500)
-    interviewer: str | None = Field(default=None, max_length=150)
-    status: InterviewStatus | None = None
+    scheduled_at: Optional[datetime] = None
+    duration_minutes: Optional[int] = Field(default=None, gt=0, le=480)
+    interview_type: Optional[InterviewType] = None
+    meeting_link: Optional[str] = Field(default=None, max_length=500)
+    interviewer: Optional[str] = Field(default=None, max_length=150)
+    status: Optional[InterviewStatus] = None
 
     @field_validator("scheduled_at")
     @classmethod
-    def require_timezone(cls, v: datetime | None) -> datetime | None:
+    def require_timezone(cls, v: Optional[datetime]) -> Optional[datetime]:
         if v is not None and v.tzinfo is None:
             raise ValueError("scheduled_at must include a timezone offset")
         return v
@@ -50,8 +52,8 @@ class InterviewResponse(BaseModel):
     scheduled_at: datetime
     duration_minutes: int
     interview_type: InterviewType
-    meeting_link: str | None
-    interviewer: str | None
+    meeting_link: Optional[str]
+    interviewer: Optional[str]
     status: InterviewStatus
     created_at: datetime
     updated_at: datetime

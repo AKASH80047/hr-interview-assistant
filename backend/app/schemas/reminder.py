@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from datetime import datetime
 from typing import Literal
@@ -15,10 +16,10 @@ class ReminderResponse(BaseModel):
     reminder_type: ReminderType
     scheduled_for: datetime
     status: ReminderStatus
-    delivered_at: datetime | None
-    acknowledged_at: datetime | None
+    delivered_at: Optional[datetime]
+    acknowledged_at: Optional[datetime]
 
     candidate_name: str
     candidate_role: str
     interview_scheduled_at: datetime
-    meeting_link: str | None
+    meeting_link: Optional[str]

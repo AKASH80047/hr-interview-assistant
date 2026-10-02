@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -109,7 +111,7 @@ def list_active_reminders(db: Session, owner_id: uuid.UUID) -> list[ReminderResp
     return [_to_response(r, i, c) for r, i, c in db.execute(stmt).all()]
 
 
-def acknowledge_reminder(db: Session, reminder_id: uuid.UUID, owner_id: uuid.UUID) -> ReminderResponse | None:
+def acknowledge_reminder(db: Session, reminder_id: uuid.UUID, owner_id: uuid.UUID) -> Optional[ReminderResponse]:
     """owner_id is required so one HR account can't acknowledge (or even discover the
     existence of) a reminder belonging to another account's interview."""
     stmt = (

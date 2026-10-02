@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -12,12 +14,12 @@ from app.schemas.auth import UserRegister
 from app.services.email_service import send_email
 
 
-def get_user_by_email(db: Session, email: str) -> User | None:
+def get_user_by_email(db: Session, email: str) -> Optional[User]:
     stmt = select(User).where(func.lower(User.email) == email.lower())
     return db.execute(stmt).scalar_one_or_none()
 
 
-def get_user_by_id(db: Session, user_id: uuid.UUID) -> User | None:
+def get_user_by_id(db: Session, user_id: uuid.UUID) -> Optional[User]:
     return db.get(User, user_id)
 
 
@@ -145,7 +147,7 @@ def resend_verification_otp(db: Session, user: User) -> str:
     return "OTP resent successfully."
 
 
-def authenticate_user(db: Session, email: str, password: str) -> User | None:
+def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
     user = get_user_by_email(db, email)
 
     if user is None or not user.is_active:

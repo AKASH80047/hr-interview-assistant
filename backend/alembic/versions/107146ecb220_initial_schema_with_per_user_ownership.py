@@ -9,7 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+
 
 revision: str = '107146ecb220'
 down_revision: Union[str, None] = None
@@ -73,7 +73,7 @@ def upgrade() -> None:
     sa.Column('storage_path', sa.String(length=500), nullable=False),
     sa.Column('file_size_bytes', sa.Integer(), nullable=True),
     sa.Column('extracted_text', sa.Text(), nullable=True),
-    sa.Column('parsed_data', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('parsed_data', sa.JSON(astext_type=sa.Text()), nullable=True),
     sa.Column('parse_status', sa.String(length=20), nullable=False),
     sa.Column('parse_error', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
@@ -87,7 +87,7 @@ def upgrade() -> None:
     sa.Column('interview_id', sa.UUID(), nullable=True),
     sa.Column('kind', sa.String(length=40), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('content', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('content', sa.JSON(astext_type=sa.Text()), nullable=True),
     sa.Column('error_message', sa.String(length=1000), nullable=True),
     sa.Column('model_name', sa.String(length=100), nullable=True),
     sa.Column('latency_ms', sa.Integer(), nullable=True),

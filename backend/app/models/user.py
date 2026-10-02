@@ -1,8 +1,10 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, String, func
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy import Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -12,7 +14,7 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        PGUUID(as_uuid=True),
+        Uuid(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
     )
@@ -46,17 +48,17 @@ class User(Base):
         default=False,
     )
 
-    otp_hash: Mapped[str | None] = mapped_column(
+    otp_hash: Mapped[Optional[str]] = mapped_column(
         String(255),
         nullable=True,
     )
 
-    otp_expires_at: Mapped[datetime | None] = mapped_column(
+    otp_expires_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
     )
 
-    otp_last_sent_at: Mapped[datetime | None] = mapped_column(
+    otp_last_sent_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
     )

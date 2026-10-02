@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 import logging
 from datetime import datetime, timezone
@@ -59,8 +61,8 @@ def run_candidate_summary(db: Session, candidate: Candidate) -> AIGeneration:
 def run_candidate_questions(
     db: Session,
     candidate: Candidate,
-    target_job_role: str | None = None,
-    interview: Interview | None = None,
+    target_job_role: Optional[str] = None,
+    interview: Optional[Interview] = None,
 ) -> AIGeneration:
     resume = get_latest_resume(db, candidate.id)
     if resume is None or not resume.extracted_text:
@@ -90,7 +92,7 @@ def run_candidate_questions(
 
 
 def run_interview_questions(
-    db: Session, interview: Interview, candidate: Candidate, target_job_role: str | None = None
+    db: Session, interview: Interview, candidate: Candidate, target_job_role: Optional[str] = None
 ) -> AIGeneration:
     return run_candidate_questions(db, candidate, target_job_role, interview)
 
@@ -152,10 +154,10 @@ def save_post_interview_summary(
 def get_latest_generation(
     db: Session,
     kind: str,
-    candidate_id: uuid.UUID | None = None,
-    interview_id: uuid.UUID | None = None,
-    status: str | None = None,
-) -> AIGeneration | None:
+    candidate_id: Optional[uuid.UUID] = None,
+    interview_id: Optional[uuid.UUID] = None,
+    status: Optional[str] = None,
+) -> Optional[AIGeneration]:
     stmt = select(AIGeneration).where(AIGeneration.kind == kind)
     if candidate_id:
         stmt = stmt.where(AIGeneration.candidate_id == candidate_id)
@@ -167,7 +169,7 @@ def get_latest_generation(
     return db.execute(stmt).scalar_one_or_none()
 
 
-def get_latest_candidate_questions(db: Session, candidate_id: uuid.UUID) -> AIGeneration | None:
+def get_latest_candidate_questions(db: Session, candidate_id: uuid.UUID) -> Optional[AIGeneration]:
     stmt = (
         select(AIGeneration)
         .where(

@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import uuid
 
 from sqlalchemy import select
@@ -56,7 +58,7 @@ def list_pending_feedback(db: Session, owner_id: uuid.UUID) -> list[InterviewRes
     return [_to_response(interview, candidate) for interview, candidate in db.execute(stmt).all()]
 
 
-def get_interview(db: Session, interview_id: uuid.UUID, owner_id: uuid.UUID) -> InterviewResponse | None:
+def get_interview(db: Session, interview_id: uuid.UUID, owner_id: uuid.UUID) -> Optional[InterviewResponse]:
     stmt = (
         select(Interview, Candidate)
         .join(Candidate, Interview.candidate_id == Candidate.id)
@@ -66,14 +68,14 @@ def get_interview(db: Session, interview_id: uuid.UUID, owner_id: uuid.UUID) -> 
     return _to_response(*row) if row else None
 
 
-def get_interview_or_none(db: Session, interview_id: uuid.UUID, owner_id: uuid.UUID) -> Interview | None:
+def get_interview_or_none(db: Session, interview_id: uuid.UUID, owner_id: uuid.UUID) -> Optional[Interview]:
     """Raw model (not the response DTO) — used by routers that need the ORM object,
     e.g. to pass into ai_service or note-taking flows."""
     stmt = select(Interview).where(Interview.id == interview_id, Interview.owner_id == owner_id)
     return db.execute(stmt).scalar_one_or_none()
 
 
-def get_candidate_or_none(db: Session, candidate_id: uuid.UUID, owner_id: uuid.UUID) -> Candidate | None:
+def get_candidate_or_none(db: Session, candidate_id: uuid.UUID, owner_id: uuid.UUID) -> Optional[Candidate]:
     stmt = select(Candidate).where(
         Candidate.id == candidate_id, Candidate.owner_id == owner_id, Candidate.deleted_at.is_(None)
     )
@@ -103,7 +105,7 @@ def create_interview(
 
 def update_interview(
     db: Session, interview_id: uuid.UUID, owner_id: uuid.UUID, data: InterviewUpdate
-) -> InterviewResponse | None:
+) -> Optional[InterviewResponse]:
     stmt = select(Interview).where(Interview.id == interview_id, Interview.owner_id == owner_id)
     interview = db.execute(stmt).scalar_one_or_none()
     if interview is None:
