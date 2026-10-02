@@ -6,6 +6,7 @@ const INITIAL_DATA = {
     id: 1,
     email: "demo@company.com",
     full_name: "Akash Sharma",
+    name: "Akash Sharma",
     organization: "Meetwise HR Labs",
     role: "admin",
   },
@@ -44,48 +45,56 @@ const INITIAL_DATA = {
   candidates: [
     {
       id: 1,
+      name: "Aarav Patel",
       full_name: "Aarav Patel",
       email: "aarav.patel@example.com",
       phone: "+91 98765 43210",
-      stage: "Technical Round",
-      job_id: 1,
+      job_role: "Senior Full-Stack Engineer",
       job_title: "Senior Full-Stack Engineer",
+      status: "interviewing",
+      stage: "Technical Round",
       ai_score: 92,
       summary: "7+ years React, Node.js, and Distributed Systems experience. Ex-Razorpay.",
       created_at: "2026-10-01T10:00:00Z",
     },
     {
       id: 2,
+      name: "Priya Nair",
       full_name: "Priya Nair",
       email: "priya.nair@example.com",
       phone: "+91 98234 56789",
-      stage: "HR Round",
-      job_id: 2,
+      job_role: "Product Designer (UI/UX)",
       job_title: "Product Designer (UI/UX)",
+      status: "interviewed",
+      stage: "HR Round",
       ai_score: 88,
-      summary: "Figma design system specialist. Led design at SaaS startups.",
+      summary: "Figma design system specialist. Led design at high-growth SaaS startups.",
       created_at: "2026-10-01T11:30:00Z",
     },
     {
       id: 3,
+      name: "Rohan Mehta",
       full_name: "Rohan Mehta",
       email: "rohan.mehta@example.com",
       phone: "+91 97123 45678",
-      stage: "Offer Extended",
-      job_id: 3,
+      job_role: "AI / ML Research Engineer",
       job_title: "AI / ML Research Engineer",
+      status: "offered",
+      stage: "Offer Extended",
       ai_score: 95,
-      summary: "Published papers on LLM agents, LangChain, and fine-tuning transformers.",
+      summary: "Published research on LLM agents, RAG, and fine-tuning open source models.",
       created_at: "2026-09-28T09:15:00Z",
     },
     {
       id: 4,
+      name: "Ananya Gupta",
       full_name: "Ananya Gupta",
       email: "ananya.gupta@example.com",
       phone: "+91 96543 21098",
-      stage: "Screening",
-      job_id: 1,
+      job_role: "Senior Full-Stack Engineer",
       job_title: "Senior Full-Stack Engineer",
+      status: "interviewing",
+      stage: "Screening",
       ai_score: 84,
       summary: "Strong TypeScript and frontend performance optimization background.",
       created_at: "2026-10-02T08:00:00Z",
@@ -99,7 +108,7 @@ const INITIAL_DATA = {
       job_title: "Senior Full-Stack Engineer",
       scheduled_at: "2026-10-02T15:30:00Z",
       status: "scheduled",
-      round: "Technical Architecture & System Design",
+      round: "Technical Architecture & Coding",
       interviewer: "Akash Sharma",
     },
     {
@@ -109,11 +118,10 @@ const INITIAL_DATA = {
       job_title: "Product Designer (UI/UX)",
       scheduled_at: "2026-10-02T17:00:00Z",
       status: "scheduled",
-      round: "Design System & Portfolio Walkthrough",
+      round: "Design System & Portfolio Review",
       interviewer: "Akash Sharma",
     },
   ],
-  reminders: [],
 };
 
 function getStored(key, defaultValue) {
@@ -129,7 +137,7 @@ function setStored(key, value) {
   try {
     localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
   } catch {
-    // Ignore storage quota errors
+    // Ignore storage quota
   }
 }
 
@@ -156,7 +164,7 @@ export function handleMockRequest(path, options = {}) {
     return INITIAL_DATA.user;
   }
 
-  if (path === "/auth/register" || path === "/auth/verify-otp" || path === "/auth/resend-otp") {
+  if (path.startsWith("/auth/")) {
     return { message: "Success (Demo Mode)" };
   }
 
@@ -202,13 +210,15 @@ export function handleMockRequest(path, options = {}) {
     if (method === "POST") {
       const newCandidate = {
         id: Date.now(),
-        full_name: body.full_name || "New Candidate",
+        name: body.name || body.full_name || "New Candidate",
+        full_name: body.full_name || body.name || "New Candidate",
         email: body.email || "candidate@example.com",
         phone: body.phone || "+91 99999 88888",
-        stage: body.stage || "Screening",
-        job_id: body.job_id || 1,
-        job_title: body.job_title || "Senior Full-Stack Engineer",
-        ai_score: Math.floor(Math.random() * 20) + 80,
+        job_role: body.job_role || body.job_title || "Senior Full-Stack Engineer",
+        job_title: body.job_title || body.job_role || "Senior Full-Stack Engineer",
+        status: "interviewing",
+        stage: "Screening",
+        ai_score: Math.floor(Math.random() * 15) + 85,
         created_at: new Date().toISOString(),
       };
       const updated = [newCandidate, ...candidates];
@@ -219,7 +229,8 @@ export function handleMockRequest(path, options = {}) {
   }
 
   if (path.startsWith("/candidates/")) {
-    const id = path.split("/")[2];
+    const parts = path.split("/");
+    const id = parts[2];
     const candidates = getStored("candidates", INITIAL_DATA.candidates);
     const candidate = candidates.find((c) => String(c.id) === String(id)) || candidates[0];
 
@@ -237,7 +248,7 @@ export function handleMockRequest(path, options = {}) {
       return { message: "Candidate removed" };
     }
 
-    if (path.endsWith("/resumes")) {
+    if (path.includes("/resumes")) {
       return [];
     }
 
@@ -266,9 +277,23 @@ export function handleMockRequest(path, options = {}) {
   }
 
   if (path.startsWith("/interviews/")) {
-    const id = path.split("/")[2];
+    const parts = path.split("/");
+    const id = parts[2];
     const interviews = getStored("interviews", INITIAL_DATA.interviews);
     return interviews.find((i) => String(i.id) === String(id)) || interviews[0];
+  }
+
+  // --- AI Briefing & Notes ---
+  if (path.startsWith("/ai/")) {
+    return {
+      status: "completed",
+      content: "Demonstrates strong foundational knowledge in system architecture, microservices, and React performance. Recommended for next stage.",
+      error_message: null,
+    };
+  }
+
+  if (path.startsWith("/notes") || path.startsWith("/questions")) {
+    return [];
   }
 
   // --- Reminders & Notifications ---
@@ -276,6 +301,5 @@ export function handleMockRequest(path, options = {}) {
     return [];
   }
 
-  // Fallback default
   return [];
 }

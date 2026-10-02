@@ -4,10 +4,10 @@ import { useReminderPolling } from "../hooks/useReminderPolling";
 import { color, s } from "../styles/theme";
 import { useState, useEffect } from "react";
 
-export default function Layout({ children, navItems }) {
+export default function Layout({ children, navItems = [] }) {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const { reminders, permission, requestPermission, soundEnabled, toggleSound } = useReminderPolling();
+  const { reminders = [], permission, requestPermission } = useReminderPolling();
   
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -17,55 +17,44 @@ export default function Layout({ children, navItems }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const current = navItems.find((item) => location.pathname.startsWith(item.to))?.label ?? "Workspace";
-
-  const DesktopSidebar = () => (
-    <aside className="hr-sidebar" style={styles.sidebar}>
-      <div style={styles.logo}>
-        <span className="hr-brand-symbol" style={{...styles.logoMark, fontSize: 20, fontWeight: 800}}>M</span>
-        <span>meetwise</span>
-      </div>
-      <nav aria-label="Workspace navigation" style={styles.nav}>
-        {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => isActive ? "active" : ""}>
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
-      <div style={styles.sidebarFooter}>
-        <div style={styles.userName}>{user.full_name}</div>
-        <button onClick={logout} style={styles.logoutButton}>Log out</button>
-      </div>
-    </aside>
-  );
-
-  const MobileBottomNav = () => (
-    <nav style={styles.bottomNav}>
-      {navItems.map((item) => (
-        <NavLink key={item.to} to={item.to} end={item.end} style={({ isActive }) => isActive ? { ...styles.bottomNavItem, ...styles.bottomNavItemActive } : styles.bottomNavItem}>
-          <span style={styles.bottomNavLabel}>{item.label}</span>
-        </NavLink>
-      ))}
-    </nav>
-  );
+  const current = (navItems || []).find((item) => location.pathname.startsWith(item.to))?.label ?? "Workspace";
 
   return (
     <div className="hr-shell" style={styles.shell}>
-      {!isMobile && <DesktopSidebar />}
+      {/* Desktop Sidebar */}
+      {!isMobile && (
+        <aside className="hr-sidebar" style={styles.sidebar}>
+          <div style={styles.logo}>
+            <span className="hr-brand-symbol" style={{ ...styles.logoMark, fontSize: 20, fontWeight: 800 }}>M</span>
+            <span>meetwise</span>
+          </div>
+          <nav aria-label="Workspace navigation" style={styles.nav}>
+            {(navItems || []).map((item) => (
+              <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => isActive ? "active" : ""}>
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+          <div style={styles.sidebarFooter}>
+            <div style={styles.userName}>{user?.full_name || user?.name || user?.email || "Workspace User"}</div>
+            <button onClick={logout} style={styles.logoutButton}>Log out</button>
+          </div>
+        </aside>
+      )}
 
       <div className="hr-main" style={styles.main}>
         <header className="workspace-topbar" style={styles.topbar}>
           <div className="workspace-topbar-inner" style={styles.topbarInner}>
             <div className="workspace-topbar-title" style={styles.topbarTitle}>
-              {isMobile && <span className="hr-brand-symbol" style={{...styles.logoMark, width: 24, height: 24, marginRight: 8, fontSize: 14, fontWeight: 800}}>M</span>}
+              {isMobile && <span className="hr-brand-symbol" style={{ ...styles.logoMark, width: 24, height: 24, marginRight: 8, fontSize: 14, fontWeight: 800 }}>M</span>}
               <strong>{current}</strong>
             </div>
             <div className="workspace-topbar-actions" style={styles.topbarActions}>
-              {reminders.length > 0 && <span style={styles.bell}>● {reminders.length}</span>}
+              {(reminders?.length ?? 0) > 0 && <span style={styles.bell}>● {reminders.length}</span>}
               {!isMobile && permission !== "granted" && permission !== "unsupported" && (
                 <button onClick={requestPermission} style={s.buttonSecondary}>Enable notifications</button>
               )}
-              {isMobile && <button onClick={logout} style={{...s.buttonSecondary, padding: "4px 8px", minHeight: 28}}>Logout</button>}
+              {isMobile && <button onClick={logout} style={{ ...s.buttonSecondary, padding: "4px 8px", minHeight: 28 }}>Logout</button>}
             </div>
           </div>
         </header>
@@ -75,7 +64,16 @@ export default function Layout({ children, navItems }) {
         </div>
       </div>
       
-      {isMobile && <MobileBottomNav />}
+      {/* Mobile Bottom Nav */}
+      {isMobile && (
+        <nav style={styles.bottomNav}>
+          {(navItems || []).map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end} style={({ isActive }) => isActive ? { ...styles.bottomNavItem, ...styles.bottomNavItemActive } : styles.bottomNavItem}>
+              <span style={styles.bottomNavLabel}>{item.label}</span>
+            </NavLink>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }
@@ -90,7 +88,7 @@ const styles = {
   userName: { fontSize: 13, fontWeight: 700, marginBottom: 12, padding: "0 8px" },
   logoutButton: { ...s.buttonSecondary, width: "100%" },
   
-  main: { flex: 1, display: "flex", flexDirection: "column", minWidth: 0, paddingBottom: 60 }, // padding bottom for mobile nav
+  main: { flex: 1, display: "flex", flexDirection: "column", minWidth: 0, paddingBottom: 60 },
   topbar: { position: "sticky", top: 0, zIndex: 20, background: "rgba(24, 24, 27, 0.8)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${color.border}`, padding: "0 24px", minHeight: 64, display: "flex", alignItems: "center" },
   topbarInner: { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" },
   topbarTitle: { display: "flex", alignItems: "center", fontSize: 16, fontWeight: 700 },
