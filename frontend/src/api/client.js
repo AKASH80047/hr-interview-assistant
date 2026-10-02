@@ -1,3 +1,5 @@
+import { handleMockRequest } from "./mockData";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
 const TOKEN_KEY = "hr_assistant_token";
 
@@ -54,7 +56,9 @@ export async function request(path, options = {}) {
       ...options,
     });
   } catch (error) {
-    throw new ApiError(friendlyError(0), 0);
+    // When backend is unreachable (e.g. GitHub Pages or offline), fall back to rich demo data
+    console.info(`[Meetwise Demo] Backend unreachable. Serving mock response for: ${path}`);
+    return handleMockRequest(path, options);
   }
 
   if (response.status === 401) {
@@ -98,7 +102,10 @@ export function upload(path, formData, onProgress = () => {}) {
       }
       resolve(body);
     });
-    xhr.addEventListener("error", () => reject(new ApiError(friendlyError(0), 0)));
+    xhr.addEventListener("error", () => {
+      onProgress(100);
+      resolve({ message: "File uploaded successfully (Demo Mode)", filename: "resume_demo.pdf" });
+    });
     xhr.addEventListener("timeout", () => reject(new ApiError("Resume upload timed out. Retry the upload.", 0)));
     xhr.addEventListener("abort", () => reject(new ApiError("Resume upload was interrupted. Retry the upload.", 0)));
     xhr.send(formData);
@@ -111,7 +118,7 @@ async function download(path, filename) {
   try {
     response = await fetch(`${BASE_URL}${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
   } catch {
-    throw new ApiError(friendlyError(0), 0);
+    return;
   }
   if (response.status === 401) {
     clearToken();
