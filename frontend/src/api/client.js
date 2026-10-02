@@ -62,7 +62,7 @@ export async function request(path, options = {}) {
     // showing a confusing "request failed" error on every panel of the app.
     clearToken();
     if (!path.startsWith("/auth/")) {
-      window.location.href = "/hr-interview-assistant/login";
+      window.location.hash = "#/login";
     }
   }
 
@@ -90,7 +90,7 @@ export function upload(path, formData, onProgress = () => {}) {
       try { body = xhr.responseText ? JSON.parse(xhr.responseText) : null; } catch { /* handled below */ }
       if (xhr.status === 401) {
         clearToken();
-        window.location.href = "/hr-interview-assistant/login";
+        window.location.hash = "#/login";
       }
       if (xhr.status < 200 || xhr.status >= 300) {
         reject(new ApiError(friendlyError(xhr.status, body, `Upload failed (${xhr.status}).`, path), xhr.status));
@@ -115,7 +115,7 @@ async function download(path, filename) {
   }
   if (response.status === 401) {
     clearToken();
-    window.location.href = "/hr-interview-assistant/login";
+    window.location.hash = "#/login";
   }
   if (!response.ok) {
     const body = await errorBody(response);
