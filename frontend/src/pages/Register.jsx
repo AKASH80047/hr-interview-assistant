@@ -90,10 +90,6 @@ export default function Register() {
 
   return (
     <div style={styles.container}>
-      <div style={styles.themeToggleContainer}>
-        <ThemeToggle />
-      </div>
-
       <div style={styles.contentWrapper}>
         <div style={styles.brandContainer}>
           <div style={{...styles.logoMark, color: "white", fontSize: 20, fontWeight: 800}}>M</div>
