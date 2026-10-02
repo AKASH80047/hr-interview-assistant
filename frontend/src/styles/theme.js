@@ -29,6 +29,13 @@ export const color = {
   errorBg: "var(--mw-error-bg)",
   info: "var(--mw-info)",
   infoBg: "var(--mw-info-bg)",
+
+  // Legacy / convenience aliases
+  textLow: "var(--mw-text-secondary)",
+  textMuted: "var(--mw-text-tertiary)",
+  accent: "var(--mw-primary)",
+  accentSoft: "var(--mw-primary-hover)",
+  accentText: "var(--mw-text-on-primary)",
 };
 
 export const font = {
