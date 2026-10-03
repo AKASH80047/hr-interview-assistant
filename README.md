@@ -48,9 +48,9 @@ The Render Free instance may take time to respond after inactivity.
 
 | Member | Role | Responsibilities |
 | --- | --- | --- |
-| **Diksha Phartyal** | AI & Backend Lead | AI workflows, backend integration, database migrations, deployment, and end-to-end testing |
-| **Anjali** | Authentication & Security | Email OTP verification, account security, password reset, and authentication tests |
-| **Siddharth** | Interview Emails & HR Reminders | Candidate interview emails, rescheduling/cancellation messages, HR-only reminders, and delivery tests |
+| **Akash Pandey
+** | AI & Backend Lead | AI workflows, backend integration, database migrations, deployment, and end-to-end testing |
+
 
 Responsibilities describe the next development phase and may evolve as the project progresses.
 
